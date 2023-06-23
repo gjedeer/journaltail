@@ -4,7 +4,7 @@ Tail -f files and systemd-journald at the same time
 # usage
 
 ```
-journaltail -u apache2.service -u nginx /var/log/messages
+journaltail -u apache2.service -u nginx /var/log/messages /var/log/mail.log
 ```
 
 Prefix systemd units with `-u` (`.service` suffix optional)
