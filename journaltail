@@ -7,7 +7,7 @@ Follow journald messages interwinded with plain text files
 
 This file is GPL3-licensed by GDR! <gdr@gdr.name>, 2023.
 
-Journalctl code based on code by tagaomag
+Journalctl code based on code by takaomag
 https://stackoverflow.com/a/26356524/170970
 """
 
