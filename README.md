@@ -7,7 +7,7 @@ Tail -f files and systemd-journald at the same time
 journaltail -u apache2.service -u nginx /var/log/messages
 ```
 
-Prefix systemd units with `-u` (.service suffix optional)
+Prefix systemd units with `-u` (`.service` suffix optional)
 
 # install
 
