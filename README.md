@@ -11,4 +11,4 @@ Prefix systemd units with `-u` (.service suffix optional)
 
 # install
 
-`apt install python3-systemd ` or `yum install systemd-python` or something similar for your distribution.
+`apt install python3-systemd ` or `yum install systemd-python` or something similar for your distribution. Then copy journaltail to `/usr/local/bin`, `~/bin` or another directory of your preference.
