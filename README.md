@@ -3,6 +3,8 @@ Tail -f files and systemd-journald at the same time
 
 # usage
 
+To view messages logged by apache2 and nginx to systemd-journald as well as lines being added to 2 log files, run the following:
+
 ```
 journaltail -u apache2.service -u nginx /var/log/messages /var/log/mail.log
 ```
