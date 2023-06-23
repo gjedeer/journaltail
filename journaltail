@@ -1,0 +1,89 @@
+#!/usr/bin/env python
+
+"""
+Works with Python 2 and 3!
+
+Follow journald messages interwinded with plain text files
+
+This file is GPL3-licensed by GDR! <gdr@gdr.name>, 2023.
+
+Journalctl code based on code by tagaomag
+https://stackoverflow.com/a/26356524/170970
+"""
+
+import argparse
+import os
+import pprint
+import select
+from systemd import journal
+
+parser = argparse.ArgumentParser()
+parser.add_argument('--unit', '-u', action='append', help='systemd units to follow')
+parser.add_argument('file', nargs='*', help='text files to follow')
+
+args = parser.parse_args()
+
+if not args.unit and args.file:
+    print('Displaying all journald messages and the following files:', ', '.join(args.file))
+elif not args.unit and not args.file:
+    print('Displaying all journald messages')
+elif args.unit and args.file:
+    print('Displaying journald messages from', ', '.join(args.unit), ' and the following files:', ', '.join(args.file))
+elif args.unit and not args.file:
+    print('Displaying journald messages from', ', '.join(args.unit))
+
+units = args.unit
+def is_wanted_unit(unit):
+    if not units:
+        return True
+
+    if not unit:
+        return False
+
+    for u in units:
+        # apache.service
+        if u == unit:
+            return True
+        # apache
+        if u == unit.replace('.service', ''):
+            return True
+
+    return False
+
+files = [{'name': fn, 'fh': open(fn, 'r')} for fn in args.file]
+for fobj in files:
+    fobj['fh'].seek(0, os.SEEK_END)
+
+j = journal.Reader()
+j.log_level(journal.LOG_INFO)
+
+# j.add_match(_SYSTEMD_UNIT="systemd-udevd.service")
+j.seek_tail()
+j.get_previous()
+# j.get_next() # it seems this is not necessary.
+
+p = select.poll()
+p.register(j, j.get_events())
+
+previous_source = None
+
+while True:
+    p.poll(0.5)
+    if j.process() != journal.APPEND:
+        continue
+
+    for entry in j:
+        if is_wanted_unit(entry.get('_SYSTEMD_UNIT', None)):
+            if entry['MESSAGE'] != "":
+                if entry.get('_SYSTEMD_UNIT', '') != previous_source:
+                    previous_source = entry.get('_SYSTEMD_UNIT', '')
+                    print('======== %s' % previous_source)
+                print('%s %s %s' % (str(entry['__REALTIME_TIMESTAMP'] ), entry.get('SYSLOG_IDENTIFIER', ''), entry['MESSAGE']))
+
+    for fobj in files:
+        new = fobj['fh'].readline()
+        if new:
+            if fobj['name'] != previous_source:
+                previous_source = fobj['name']
+                print('======== %s' % previous_source)
+            print(new.strip())
