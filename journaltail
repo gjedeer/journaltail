@@ -69,21 +69,20 @@ previous_source = None
 
 while True:
     p.poll(0.5)
-    if j.process() != journal.APPEND:
-        continue
-
-    for entry in j:
-        if is_wanted_unit(entry.get('_SYSTEMD_UNIT', None)):
-            if entry['MESSAGE'] != "":
-                if entry.get('_SYSTEMD_UNIT', '') != previous_source:
-                    previous_source = entry.get('_SYSTEMD_UNIT', '')
-                    print('======== %s' % previous_source)
-                print('%s %s %s' % (str(entry['__REALTIME_TIMESTAMP'] ), entry.get('SYSLOG_IDENTIFIER', ''), entry['MESSAGE']))
+    if j.process() == journal.APPEND:
+        for entry in j:
+            if is_wanted_unit(entry.get('_SYSTEMD_UNIT', None)):
+                if entry['MESSAGE'] != "":
+                    if entry.get('_SYSTEMD_UNIT', '') != previous_source:
+                        previous_source = entry.get('_SYSTEMD_UNIT', '')
+                        print('======== %s' % previous_source)
+                    print('%s %s %s' % (str(entry['__REALTIME_TIMESTAMP'] ), entry.get('SYSLOG_IDENTIFIER', ''), entry['MESSAGE']))
 
     for fobj in files:
         new = fobj['fh'].readline()
-        if new:
+        while new:
             if fobj['name'] != previous_source:
                 previous_source = fobj['name']
                 print('======== %s' % previous_source)
             print(new.strip())
+            new = fobj['fh'].readline()

@@ -14,3 +14,7 @@ Prefix systemd units with `-u` (`.service` suffix is optional)
 # install
 
 `apt install python3-systemd` or `yum install systemd-python` or something similar for your distribution. Then copy journaltail to `/usr/local/bin`, `~/bin` or another directory of your preference.
+
+## oneliner for RHEL
+
+`[[ $(rpm -E %rhel) -le 7 ]] && yum install -y systemd-python || yum install -y systemd-python3 && wget -O /usr/local/bin/journaltail https://github.com/gjedeer/journaltail/raw/main/journaltail && chmod +x /usr/local/bin/journaltail`
