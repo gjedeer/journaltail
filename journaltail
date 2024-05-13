@@ -68,7 +68,7 @@ p.register(j, j.get_events())
 previous_source = None
 
 while True:
-    p.poll(0.5)
+    p.poll(200)
     if j.process() == journal.APPEND:
         for entry in j:
             if is_wanted_unit(entry.get('_SYSTEMD_UNIT', None)):
